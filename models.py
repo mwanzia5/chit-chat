@@ -11,7 +11,8 @@ class User(db.Model):
     phone_number = db.Column(db.String,nullable = False ,unique=True)
     password = db.Column (db.VARCHAR ,nullable = False)
     profile_photo = db.Column (db.VARCHAR ,nullable = True)
-    created_at = db.column (db.TIMESTAMP)
+    created_at = db.Column(db.TIMESTAMP, server_default=db.func.now())
+
 
 class Messages (db.Model):
     __tablename__ = 'messages'
@@ -20,7 +21,7 @@ class Messages (db.Model):
     contact_id= db.Column(db.VARCHAR,nullable=True)
     user_id = db.Column(db.VARCHAR,nullable = True)
     message = db.Column(db.VARCHAR,nullable = True)
-    sent_at = db.Column(db.TIMESTAMP)
+    sent_at = db.Column(db.TIMESTAMP,server_default=db.func.now())
     media = db.Column(db.VARCHAR,nullable=True)
 
 
@@ -34,6 +35,6 @@ class Contacts(db.Model):
     about=db.Column(db.VARCHAR,nullable=True)
     profile_photo = db.Column (db.VARCHAR ,nullable = True)
     previous_chat=db.Column(db.VARCHAR,nullable = True)
-    last_seen=db.Column(db.TIMESTAMP)
+    last_seen=db.Column(db.TIMESTAMP,server_default=db.func.now())
 
 
