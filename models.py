@@ -25,6 +25,7 @@ class Messages (db.Model):
     media = db.Column(db.VARCHAR,nullable=True)
 
 
+
 class Contacts(db.Model):
     __tablename__ = 'contacts'
 
