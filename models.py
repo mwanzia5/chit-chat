@@ -1,9 +1,12 @@
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy_serializer import SerializerMixin
 
 db = SQLAlchemy()
 
-class User(db.Model):
+class User(db.Model, SerializerMixin):
     __tablename__ = 'users'
+
+    serialize_rules = ('-message.user',)
     
     id = db.Column(db.Integer,primary_key = True)
     first_name =db.Column(db.String,nullable = False)
@@ -13,21 +16,27 @@ class User(db.Model):
     profile_photo = db.Column (db.VARCHAR ,nullable = True)
     created_at = db.Column(db.TIMESTAMP, server_default=db.func.now())
 
+    messages = db.relationship('Message', backref = 'user')
 
-class Messages (db.Model):
+
+class Message(db.Model, SerializerMixin):
     __tablename__ = 'messages'
 
+    serialize_rules = ('-user.messages', '-contact.,messages',)
+
     id = db.Column(db.Integer,primary_key = True)
-    contact_id= db.Column(db.VARCHAR,nullable=True)
-    user_id = db.Column(db.VARCHAR,nullable = True)
+    contact_id= db.Column(db.Integer,db.ForeignKey('contacts.id'))
+    user_id = db.Column(db.Integer,db.ForeignKey('users.id'))
     message = db.Column(db.VARCHAR,nullable = True)
     sent_at = db.Column(db.TIMESTAMP,server_default=db.func.now())
     media = db.Column(db.VARCHAR,nullable=True)
 
 
 
-class Contacts(db.Model):
+class Contact(db.Model, SerializerMixin):
     __tablename__ = 'contacts'
+
+    serialize_rules = ('-message.contact',)
 
     id = db.Column(db.Integer,primary_key = True)
     first_name =db.Column(db.String,nullable = False)
@@ -37,5 +46,7 @@ class Contacts(db.Model):
     profile_photo = db.Column (db.VARCHAR ,nullable = True)
     previous_chat=db.Column(db.VARCHAR,nullable = True)
     last_seen=db.Column(db.TIMESTAMP,server_default=db.func.now())
+
+    messages = db.relationship('Message', backref = 'contact')
 
 
