@@ -1,13 +1,18 @@
-from flask_restful import Resource,Api
+from flask import make_response
+from flask_restful import Resource,jsonify
 from models import Message
 
-class Message_list (Resource):
-    def get(self):
-          response_dict_list = [n.to_dict() for n in Message_list.query.all()]
+class MessageList (Resource):
+    def get(self,id):
+                  
+       message_dict= Message.query.filter_by(id=id).first().to_dict()
 
-response = make_response(
-            jsonify(response_dict_list),
+       message= make_response(
+            jsonify(message_dict),
             200,
         )
-return response
+
+       return message
+
+
 
