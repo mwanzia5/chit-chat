@@ -1,5 +1,6 @@
 from flask import Flask
 from flask_migrate import Migrate
+from messages import Message_list
 from flask_restful import Api
 from models import db
 app = Flask(__name__)
@@ -20,5 +21,9 @@ api=Api(app)
 @app.route("/")
 def hello():
     return "<h1>Hello chit-chat</h1>"
+
+
+api.add_resource(Message_list, '/messages')
+
 if __name__ == "__main__":
     app.run(debug=True)
