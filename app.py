@@ -22,6 +22,8 @@ api=Api(app)
 def hello():
     return "<h1>Hello chit-chat</h1>"
 
+api.add_resource(Contact_List, '/contacts')
+api.add_resource(Contact_by_id, '/contacts/<int:id>')
 
 api.add_resource(Message_list, '/messages')
 
