@@ -26,5 +26,7 @@ def hello():
 api.add_resource(Contact_List, '/contacts')
 api.add_resource(Contact_by_id, '/contacts/<int:id>')
 
+api.add_resource(Message_list, '/messages')
+
 if __name__ == "__main__":
     app.run(port = 5555, debug=True)
