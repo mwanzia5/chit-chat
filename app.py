@@ -2,13 +2,11 @@ from flask import Flask,make_response
 from flask_migrate import Migrate
 from messages import Messages_List
 from flask_restful import Api
-<<<<<<< HEAD
 from models import db,Message
-=======
+
 from models import db, Contact
 from contacts import Contact_List, Contact_by_id
 
->>>>>>> e4f9bf2837aef8331c4d7f77d95206ba55727840
 app = Flask(__name__)
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///chit-chat.db'
@@ -34,8 +32,6 @@ api.add_resource(Contact_by_id, '/contacts/<int:id>')
 api.add_resource(Messages_List, '/messages/<int:id>')
 
 if __name__ == "__main__":
-<<<<<<< HEAD
+
     app.run(port=5555)
-=======
-    app.run(port = 5555, debug=True)
->>>>>>> e4f9bf2837aef8331c4d7f77d95206ba55727840
+
