@@ -1,6 +1,6 @@
 from app import app
 
-from models import db, Contact
+from models import db, Contact,Message
 
 contacts = [{
   "id": 1,
@@ -84,6 +84,55 @@ contacts = [{
   "previous_chat": "",
 }]
 
+#with app.app_context():
+   # db.session.add_all([Contact(**contact) for contact in contacts])
+   # db.session.commit()
+
+messages = [{
+  "id": 1,
+  "contact_id": 1,
+  "user_id": 1,
+  "message": "Ut tellus. Nulla ut erat id mauris vulputate elementum. Nullam varius. Nulla facilisi. Cras non velit nec nisi vulputate nonummy. Maecenas tincidunt lacus at velit.",
+  "sent_at": "",
+  "media": "6064f55f-62f9-4853-9ae6-ffcdeef11324"
+}, {
+  "id": 2,
+  "contact_id": 2,
+  "user_id": 2,
+  "message": "Aliquam augue quam, sollicitudin vitae, consectetuer eget, rutrum at, lorem. Integer tincidunt ante vel ipsum. Praesent blandit lacinia erat. Vestibulum sed magna at nunc commodo placerat.",
+  "sent_at": "",
+  "media": "1f609ba2-f9fb-42e8-8031-ef394ed7425b"
+}, {
+  "id": 3,
+  "contact_id": 3,
+  "user_id": 3,
+  "message": "Morbi a ipsum.",
+  "sent_at": "",
+  "media": "5caa05c1-99f1-407d-8895-11500d012ee1"
+}, {
+  "id": 4,
+  "contact_id": 4,
+  "user_id": 4,
+  "message": "Proin leo odio, porttitor id, consequat in, consequat ut, nulla. Sed accumsan felis. Ut at dolor quis odio consequat varius.",
+  "sent_at": "",
+  "media": "dea5581d-1d40-4370-ae3b-9d1640448d20"
+}, {
+  "id": 5,
+  "contact_id": 5,
+  "user_id": 5,
+  "message": "Nam nulla.",
+  "sent_at": "",
+  "media": "7bc61106-200c-492e-839f-40dbba4fd42e"
+}, {
+  "id": 6,
+  "contact_id": 6,
+  "user_id": 6,
+  "message": "Cras non velit nec nisi vulputate nonummy. Maecenas tincidunt lacus at velit. Vivamus vel nulla eget eros elementum pellentesque. Quisque porta volutpat erat. Quisque erat eros, viverra eget, congue eget, semper rutrum, nulla. Nunc purus.",
+  "sent_at": "",
+  "media": "074fe972-7b80-4809-bb22-c6f98d2c44c5"
+}]
+
 with app.app_context():
-    db.session.add_all([Contact(**contact) for contact in contacts])
+    db.session.add_all([Message(**message) for message in messages])
     db.session.commit()
+

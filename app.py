@@ -1,7 +1,8 @@
 from flask import Flask,make_response
 from flask_migrate import Migrate
-from messages import Messages_List
 from flask_restful import Api
+
+from messages import message_chat
 
 from models import db,Message
 
@@ -31,7 +32,8 @@ def hello():
 api.add_resource(Contact_List, '/contacts')
 api.add_resource(Contact_by_id, '/contacts/<int:id>')
 
-api.add_resource(Messages_List, '/messages/<int:id>')
+api.add_resource(message_chat, '/messages')
+
 
 if __name__ == "__main__":
 
