@@ -1,7 +1,9 @@
-from flask import Flask
+from flask import Flask,make_response
 from flask_migrate import Migrate
-from messages import Message_list
 from flask_restful import Api
+from messages import message_chat
+from models import db,Message
+
 from models import db, Contact
 from contacts import Contact_List, Contact_by_id
 
@@ -27,7 +29,9 @@ def hello():
 api.add_resource(Contact_List, '/contacts')
 api.add_resource(Contact_by_id, '/contacts/<int:id>')
 
-api.add_resource(Message_list, '/messages')
+api.add_resource(message_chat, '/messages')
+
 
 if __name__ == "__main__":
-    app.run(port = 5555, debug=True)
+
+    app.run(port=5555)
