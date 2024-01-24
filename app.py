@@ -38,4 +38,3 @@ api.add_resource(message_chat, '/messages')
 if __name__ == "__main__":
 
     app.run(port=5555)
-

@@ -1,4 +1,5 @@
 from flask_sqlalchemy import SQLAlchemy
+from flask_bcrypt import check_password_hash
 from sqlalchemy_serializer import SerializerMixin
 
 db = SQLAlchemy()
@@ -18,6 +19,10 @@ class User(db.Model, SerializerMixin):
 
     messages = db.relationship('Message', backref = 'user')
 
+    def check_password(self,plain_password):
+        return check_password_hash(self.password,plain_password)
+
+
 
 class Message(db.Model, SerializerMixin):
     __tablename__ = 'messages'
@@ -30,7 +35,6 @@ class Message(db.Model, SerializerMixin):
     message = db.Column(db.VARCHAR,nullable = True)
     sent_at = db.Column(db.TIMESTAMP,server_default=db.func.now())
     media = db.Column(db.VARCHAR,nullable=True)
-
 
 
 class Contact(db.Model, SerializerMixin):
