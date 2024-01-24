@@ -27,7 +27,7 @@ class User(db.Model, SerializerMixin):
 class Message(db.Model, SerializerMixin):
     __tablename__ = 'messages'
 
-    serialize_rules = ('-user.messages', '-contact.,messages',)
+    serialize_rules = ('-user.messages', '-contact.messages',)
 
     id = db.Column(db.Integer,primary_key = True)
     contact_id= db.Column(db.Integer,db.ForeignKey('contacts.id'))
