@@ -1,11 +1,14 @@
 from flask import Flask,make_response
 from flask_migrate import Migrate
 from flask_restful import Api
+
 from messages import message_chat
+
 from models import db,Message
 
 from models import db, Contact
 from contacts import Contact_List, Contact_by_id
+
 
 app = Flask(__name__)
 
