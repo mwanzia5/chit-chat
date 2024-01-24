@@ -6,6 +6,7 @@ from models import db
 from seed import messages
 
 class message_chat(Resource):
+
  def get(self):
     message_chat = []
     for message in Message.query.all():
@@ -17,5 +18,6 @@ class message_chat(Resource):
     )
 
     return response
+
 
             
