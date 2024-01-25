@@ -33,26 +33,53 @@ class User_Signup(Resource):
 
 
 class User_Login(Resource):
+    # def post(self):
+    #     data = request.get_json()
+
+    #     # Extract user information from the request
+    #     phone_number = data.get('phone number')
+    #     password = data.get('password')
+
+    #     # Find the user with the provided phone number
+    #     user = User.query.filter_by(phone_number=phone_number).first()
+
+    #     if user:
+    #         # check if provided password is correct
+    #         is_password_correct = user.check_password(password)
+
+    #         if is_password_correct:
+    #             # Generate token and return user dict
+    #             user_json = user.to_json()
+    #             access_token = create_access_token(identity=user_json['id'])
+    #             return {'message': 'Login successful', 'access_token': access_token}, 200
+    #         else:
+    #             return {'message': 'Invalid phone number or password'}, 401
+    #     else:
+    #         return {'message': 'User not found'}, 404
+
+
     def post(self):
-        data = request.get_json()
+            data = request.get_json()
 
-        # Extract user information from the request
-        phone_number = data.get('phone number')
-        password = data.get('password')
+            # Extract user information from the request
+            phone_number = data.get('phone number')
+            password = data.get('password')
 
-        # Find the user with the provided phone number
-        user = User.query.filter_by(phone_number=phone_number).first()
+            # Find the user with the provided phone number
+            user = User.query.filter_by(phone_number=phone_number).first()
 
-        if user:
-            # check if provided password is correct
-            is_password_correct = user.check_password(password)
+            if user:
+                # check if provided password is correct
+                is_password_correct = user.check_password(password)
 
-            if is_password_correct:
-                # Generate token and return user dict
-                user_json = user.to_json()
-                access_token = create_access_token(identity=user_json['id'])
-                return {'message': 'Login successful', 'access_token': access_token}, 200
+                if is_password_correct:
+                    # Generate token and return user dict
+                    user_json = user.to_json()
+                    access_token = create_access_token(identity=user_json['id'])
+                    return {'message': 'Login successful', 'access_token': access_token}, 200
+                else:
+                    return {'message': 'Invalid phone number or password'}, 401
             else:
-                return {'message': 'Invalid phone number or password'}, 401
-        else:
-            return {'message': 'User not found'}, 404
+                return {'message': 'User not found'}, 404
+
+
