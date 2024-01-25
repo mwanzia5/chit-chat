@@ -1,29 +1,31 @@
 from flask_restful import Api, Resource, request
-from flask_bcrypt import generate_password_hash
+from app import bcrypt
+from flask_Bcrypt import generate_password_hash
 from flask_jwt_extended import create_access_token
 from models import db, User
 
 class User_Signup(Resource):
     def post(self):
-        data = request.get_json()
-
+        
         # Extract user information from the request
-        first_name = data.get('first name')
-        last_name = data.get('last name')
-        phone_number = data.get('phone number')
-        password = data.get('password')
-        profile_photo = data.get('profile photo')
-
+        new_user = User(
+            first_name = request.form.get("first_name"),
+            last_name = request.form.get("last_name"),
+            phone_number = request.form.get("phone_number"),
+            password = request.form.get("password"),
+            profile_photo = request.form.get("profile_photo"),
+            )
+        
         # Validate if phone and password are provided
-        if not phone_number or not password:
-            return {'message': 'Both phone and password are required'}, 400
+        # if not new_user.phone_number or not new_user.password:
+        #     return {'message': 'Both phone and password are required'}, 400
 
         # Check if the phone number is already registered
-        if User.query.filter_by(phone_number=phone_number).first():
+        if User.query.filter_by(phone_number = new_user.phone_number).first():
             return {'message': 'Phone number already registered'}, 400
 
         # Add the new user to the database
-        new_user = User(phone_number=phone_number, password=generate_password_hash(password).decode('utf-8'))
+        new_user = User(phone_number=new_user.phone_number, password=generate_password_hash(new_user.password).decode('utf-8'))
         db.session.add(new_user)
         db.session.commit()
 
