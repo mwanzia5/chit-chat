@@ -3,7 +3,7 @@ from flask_migrate import Migrate
 from flask_restful import Api,Resource ,request
 from flask_cors import CORS
 from flask_bcrypt import Bcrypt , generate_password_hash
-from flask_jwt_extended import create_access_token
+from flask_jwt_extended import JWTManager, create_access_token, create_refresh_token
 from messages import message_chat,messages_by_id
 from models import db,Message,Contact ,User
 from contacts import Contact_List, Contact_by_id
@@ -12,9 +12,8 @@ from contacts import Contact_List, Contact_by_id
 app = Flask(__name__)
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///chit-chat.db'
-
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-
+app.config["JWT_SECRET_KEY"] = "super-secret"
 app.json.compact = False
 
 migrations =Migrate(app ,db)
@@ -25,6 +24,7 @@ api=Api(app)
 CORS(app)
 
 bcrypt = Bcrypt(app)
+jwt = JWTManager(app)
 
 
 @app.route("/")
@@ -69,11 +69,10 @@ class User_Signup(Resource):
 
 class User_Login(Resource):
     def post(self):
-            data = request.form
 
             # Extract user information from the request
-            phone_number = data.get('phone_number')
-            password = data.get('password')
+            phone_number = request.form.get('phone_number')
+            password = request.form.get('password')
 
             # Find the user with the provided phone number
             user = User.query.filter_by(phone_number=phone_number).first()
@@ -86,7 +85,13 @@ class User_Login(Resource):
                     # Generate token and return user dict
                     user_json = user.to_json()
                     access_token = create_access_token(identity=user_json['id'])
-                    return {'message': 'Login successful', 'access_token': access_token}, 200
+                    refresh_token = create_refresh_token(identity=user_json['id'])
+                    return {"message": "Login successful",
+                            "status": "success",
+                            "access_token": access_token,
+                            "refresh_token": refresh_token,
+                            "user": user_json,
+                            }, 200
                 else:
                     return {'message': 'Invalid phone number or password'}, 401
             else:
