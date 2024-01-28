@@ -1,6 +1,6 @@
 from app import app
 
-from models import db, Contact,Message
+from models import db, Contact,Message, Status
 
 contacts = [{
   "id": 1,
@@ -126,7 +126,36 @@ messages = [{
   "media": "074fe972-7b80-4809-bb22-c6f98d2c44c5"
 }]
 
-with app.app_context():
-    db.session.add_all([Message(**message) for message in messages])
-    db.session.commit()
+# with app.app_context():
+#     db.session.add_all([Message(**message) for message in messages])
+#     db.session.commit()
 
+statuses = [{
+  "status_text": "Hi, am a user",
+  "user_id": 1,
+  "photo_url": ""
+}, {
+  "status_text": "I like it here",
+  "user_id": 1,
+  "photo_url": ""
+}, {
+  "status_text": "Hi, am a user",
+  "user_id": 2,
+  "photo_url": ""
+}, {
+  "status_text": "I like it  alot here",
+  "user_id": 2,
+  "photo_url": ""
+}, {
+  "status_text": "Hi, i've been here a long time",
+  "user_id": 3,
+  "photo_url": ""
+}, {
+  "status_text": "Hi, am a new user",
+  "user_id": 4,
+  "photo_url": ""
+}]
+
+with app.app_context():
+    db.session.add_all([Status(**status) for status in statuses])
+    db.session.commit()
