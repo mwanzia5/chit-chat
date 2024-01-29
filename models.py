@@ -18,6 +18,7 @@ class User(db.Model, SerializerMixin):
     created_at = db.Column(db.TIMESTAMP, server_default=db.func.now())
 
     messages = db.relationship('Message', backref = 'user')
+    statuses = db.relationship('Status', backref = 'user')
     
     def __repr__(self):
         return {"id": self.id, 
@@ -88,5 +89,24 @@ class Contact(db.Model, SerializerMixin):
                 "previous_chat": self.previous_chat,
                 "last_seen": self.last_seen
                 }
+    
+class Status(db.Model, SerializerMixin):
+    __tablename__ = 'statuses'
 
+    serialize_rules = ('-user',)
+# 
+    id = db.Column(db.Integer,primary_key = True)
+    status_text = db.Column(db.String,nullable = False)
+    sent_at = db.Column(db.TIMESTAMP,server_default=db.func.now())
+    photo_url  = db.Column (db.VARCHAR ,nullable = True)
+
+    user_id = db.Column(db.Integer,db.ForeignKey('users.id'))
+
+    def __repr__(self):
+        return {"id": self.id, 
+                "status_text": self.status_text, 
+                "sent_at": self.sent_at,
+                "photo_url": self.photo_url,
+                "user_id": self.user_id,
+                }
 

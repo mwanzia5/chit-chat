@@ -7,6 +7,7 @@ from flask_jwt_extended import JWTManager, create_access_token, create_refresh_t
 from messages import message_chat,messages_by_id
 from models import db,Message,Contact ,User
 from contacts import Contact_List, Contact_by_id
+from statuses import Status_List, Status_by_id
 
 
 app = Flask(__name__)
@@ -107,6 +108,9 @@ api.add_resource(messages_by_id, '/messages/<int:id>')
 
 api.add_resource(User_Signup, '/users')
 api.add_resource(User_Login, '/login')
+
+api.add_resource(Status_List, '/statuses')
+api.add_resource(Status_by_id, '/statuses/<int:id>')
 
 
 
