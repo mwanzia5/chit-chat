@@ -19,6 +19,26 @@ class message_chat(Resource):
     )
 
     return response
+ 
+ def post(self):
+        new_message = Message(
+            contact_id = request.form.get("contact_id"),
+            user_id = request.form.get("user_id"),
+            message = request.form.get("message"),
+            media = request.form.get("media")
+            )
+        db.session.add(new_message)
+        db.session.commit()
+
+        message_dict = new_message.to_dict()
+
+        response = make_response(
+            jsonify(message_dict),
+            201
+        )
+
+        return response
+    
 
 class messages_by_id(Resource):
 
