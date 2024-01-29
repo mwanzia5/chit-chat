@@ -18,16 +18,33 @@ class User(db.Model, SerializerMixin):
     created_at = db.Column(db.TIMESTAMP, server_default=db.func.now())
 
     messages = db.relationship('Message', backref = 'user')
-
+    statuses = db.relationship('Status', backref = 'user')
+    
+    def __repr__(self):
+        return {"id": self.id, 
+                "first_name": self.first_name, 
+                "last_name": self.last_name,
+                "phone_number": self.phone_number,
+                "profile_photo": self.profile_photo
+                }
+    
     def check_password(self,plain_password):
         return check_password_hash(self.password,plain_password)
+    
+    def to_json(self):
+        return {"id": self.id, 
+                "first_name": self.first_name, 
+                "last_name": self.last_name,
+                "phone_number": self.phone_number,
+                "profile_photo": self.profile_photo
+                }
 
 
 
 class Message(db.Model, SerializerMixin):
     __tablename__ = 'messages'
 
-    serialize_rules = ('-user.messages', '-contact.messages',)
+    serialize_rules = ('-user', '-contact',)
 
     id = db.Column(db.Integer,primary_key = True)
     contact_id= db.Column(db.Integer,db.ForeignKey('contacts.id'))
@@ -36,11 +53,20 @@ class Message(db.Model, SerializerMixin):
     sent_at = db.Column(db.TIMESTAMP,server_default=db.func.now())
     media = db.Column(db.VARCHAR,nullable=True)
 
+    def __repr__(self):
+        return {"id": self.id, 
+                "contact_id": self.contact_id, 
+                "user_id": self.user_id,
+                "message": self.message,
+                "media": self.media,
+                "sent_at": self.sent_at
+                }
+
 
 class Contact(db.Model, SerializerMixin):
     __tablename__ = 'contacts'
 
-    serialize_rules = ('-message.contact',)
+    serialize_rules = ('-messages.contact','-messages.user')
 
     id = db.Column(db.Integer,primary_key = True)
     first_name =db.Column(db.String,nullable = False)
@@ -53,4 +79,34 @@ class Contact(db.Model, SerializerMixin):
 
     messages = db.relationship('Message', backref = 'contact')
 
+    def __repr__(self):
+        return {"id": self.id, 
+                "first_name": self.first_name, 
+                "last_name": self.last_name,
+                "phone_number": self.phone_number,
+                "about": self.about,
+                "profile_photo": self.profile_photo,
+                "previous_chat": self.previous_chat,
+                "last_seen": self.last_seen
+                }
+    
+class Status(db.Model, SerializerMixin):
+    __tablename__ = 'statuses'
+
+    serialize_rules = ('-user',)
+# 
+    id = db.Column(db.Integer,primary_key = True)
+    status_text = db.Column(db.String,nullable = False)
+    sent_at = db.Column(db.TIMESTAMP,server_default=db.func.now())
+    photo_url  = db.Column (db.VARCHAR ,nullable = True)
+
+    user_id = db.Column(db.Integer,db.ForeignKey('users.id'))
+
+    def __repr__(self):
+        return {"id": self.id, 
+                "status_text": self.status_text, 
+                "sent_at": self.sent_at,
+                "photo_url": self.photo_url,
+                "user_id": self.user_id,
+                }
 
