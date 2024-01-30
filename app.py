@@ -1,6 +1,6 @@
 from flask import Flask,make_response ,jsonify
 from flask_migrate import Migrate
-from flask_restful import Api,Resource ,request
+from flask_restful import Api,Resource ,request, reqparse
 from flask_cors import CORS
 from flask_bcrypt import Bcrypt , generate_password_hash
 from flask_jwt_extended import JWTManager, create_access_token, create_refresh_token
@@ -34,16 +34,20 @@ def hello():
 
 
 class User_Signup(Resource):
+    parser = reqparse.RequestParser()
+    parser.add_argument('first_name', required=True, help="Firstname is required")
+    parser.add_argument('last_name', required=True, help="Last_name is required")
+    parser.add_argument('phone_number', required=True, help="Phone number is required")
+    parser.add_argument('password', required=True, help="Password is required")
+    parser.add_argument('profile_photo', required=False)
+
     def post(self):
         
         # Extract user information from the request
-        new_user = User(
-            first_name = request.form.get("first_name"),
-            last_name = request.form.get("last_name"),
-            phone_number = request.form.get("phone_number"),
-            password = request.form.get("password"),
-            profile_photo = request.form.get("profile_photo"),
-            )
+        data = User_Signup.parser.parse_args()
+        new_user = User(**data)
+        print(new_user.first_name)
+        print(new_user.last_name)
         
         # Validate if phone and password are provided
         if not new_user.phone_number or not new_user.password:
@@ -52,13 +56,6 @@ class User_Signup(Resource):
         # Check if the phone number is already registered
         if User.query.filter_by(phone_number = new_user.phone_number).first():
             return {'message': 'Phone number already registered'}, 400
-
-        # Add the new user to the database
-        # new_user = User(first_name =new_user.first_name ,
-        #                   last_name =new_user.last_name ,
-        #                   phone_number=new_user.phone_number, 
-        #                   password=generate_password_hash(new_user.password).decode('utf-8'),
-        #                   profile_photo = new_user.profile_photo)
 
         new_user.password = generate_password_hash(new_user.password).decode('utf-8') 
 
@@ -69,18 +66,26 @@ class User_Signup(Resource):
 
 
 class User_Login(Resource):
-    def post(self):
+        parser = reqparse.RequestParser()
+        parser.add_argument('phone_number', required=True, help="Email address is required")
+        parser.add_argument('password', required=True, help="Password is required")
+        
+        def post(self):
+
+            data = User_Login.parser.parse_args()
 
             # Extract user information from the request
-            phone_number = request.form.get('phone_number')
-            password = request.form.get('password')
+            # phone_number = request.form.get('phone_number')
+            # password = request.form.get('password')
+            # print(phone_number)
+            # print(password)
 
             # Find the user with the provided phone number
-            user = User.query.filter_by(phone_number=phone_number).first()
+            user = User.query.filter_by(phone_number= data['phone_number']).first()
 
             if user:
                 # check if provided password is correct
-                is_password_correct = user.check_password(password)
+                is_password_correct = user.check_password(data['password'])
 
                 if is_password_correct:
                     # Generate token and return user dict
@@ -106,7 +111,7 @@ api.add_resource(Contact_by_id, '/contacts/<int:id>')
 api.add_resource(message_chat, '/messages')
 api.add_resource(messages_by_id, '/messages/<int:id>')
 
-api.add_resource(User_Signup, '/users')
+api.add_resource(User_Signup, '/signup')
 api.add_resource(User_Login, '/login')
 
 api.add_resource(Status_List, '/statuses')
