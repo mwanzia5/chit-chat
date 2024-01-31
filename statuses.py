@@ -1,9 +1,10 @@
 from flask import make_response, jsonify, request
 from flask_restful import Resource
+from flask_jwt_extended import jwt_required
 from models import db, Status
 
 class Status_List(Resource):
-
+    @jwt_required()
     def get(self):
         status_list = []
         for status in Status.query.all():
@@ -18,9 +19,9 @@ class Status_List(Resource):
     
     def post(self):
         new_status = Status(
-            status_text = request.form.get("status_text"),
-            photo_url = request.form.get("photo_url"),
-            user_id = request.form.get("user_id"),
+            status_text = request.get_json().get("status_text"),
+            photo_url = request.get_json().get("photo_url"),
+            user_id = request.get_json().get("user_id"),
             )
         db.session.add(new_status)
         db.session.commit()
@@ -49,8 +50,8 @@ class Status_by_id(Resource):
 
     def patch(self,id):
         status = Status.query.filter_by(id = id).first()
-        for attr in request.form:
-            setattr(status, attr, request.form.get(attr))
+        for attr in request.get_json():
+            setattr(status, attr, request.get_json().get(attr))
 
         db.session.add(status)
         db.session.commit()

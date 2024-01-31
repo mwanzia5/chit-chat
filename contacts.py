@@ -1,10 +1,11 @@
 from flask import make_response, jsonify, request
 from flask_restful import Resource, fields, marshal_with, reqparse
+from flask_jwt_extended import jwt_required
 from models import db,Contact
 
 
 class Contact_List(Resource):
-
+    @jwt_required()
     def get(self):
         contact_list = []
         for contact in Contact.query.all():
@@ -19,12 +20,12 @@ class Contact_List(Resource):
     
     def post(self):
         new_contact = Contact(
-            first_name = request.form.get("first_name"),
-            last_name = request.form.get("last_name"),
-            phone_number = request.form.get("phone_number"),
-            about = request.form.get("about"),
-            profile_photo = request.form.get("profile_photo"),
-            previous_chat = request.form.get("previous_chat"),
+            first_name = request.get_json().get("first_name"),
+            last_name = request.get_json().get("last_name"),
+            phone_number = request.get_json().get("phone_number"),
+            about = request.get_json().get("about"),
+            profile_photo = request.get_json().get("profile_photo"),
+            previous_chat = request.get_json().get("previous_chat"),
             )
         db.session.add(new_contact)
         db.session.commit()
@@ -53,8 +54,8 @@ class Contact_by_id(Resource):
 
     def patch(self,id):
         contact = Contact.query.filter_by(id = id).first()
-        for attr in request.form:
-            setattr(contact, attr, request.form.get(attr))
+        for attr in request.get_json():
+            setattr(contact, attr, request.get_json().get(attr))
 
         db.session.add(contact)
         db.session.commit()

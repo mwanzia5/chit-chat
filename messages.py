@@ -2,11 +2,12 @@
 from models import Message
 from flask_restful import Resource
 from flask import make_response,jsonify ,request
+from flask_jwt_extended import jwt_required
 from models import db
 
 
 class message_chat(Resource):
-
+ @jwt_required()
  def get(self):
     message_chat = []
     for message in Message.query.all():
@@ -22,10 +23,10 @@ class message_chat(Resource):
  
  def post(self):
         new_message = Message(
-            contact_id = request.form.get("contact_id"),
-            user_id = request.form.get("user_id"),
-            message = request.form.get("message"),
-            media = request.form.get("media")
+            contact_id = request.get_json().get("contact_id"),
+            user_id = request.get_json().get("user_id"),
+            message = request.get_json().get("message"),
+            media = request.get_json().get("media")
             )
         db.session.add(new_message)
         db.session.commit()
@@ -44,8 +45,8 @@ class messages_by_id(Resource):
 
  def patch(self,id):
         message = Message.query.filter_by(id = id).first()
-        for attr in request.form:
-            setattr(message, attr, request.form.get(attr))
+        for attr in request.get_json():
+            setattr(message, attr, request.get_json().get(attr))
 
         db.session.add(message)
         db.session.commit()
