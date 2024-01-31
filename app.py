@@ -1,9 +1,11 @@
+
 from flask import Flask,make_response ,jsonify
 from flask_migrate import Migrate
 from flask_restful import Api,Resource ,request, reqparse
 from flask_cors import CORS
 from flask_bcrypt import Bcrypt , generate_password_hash
-from flask_jwt_extended import JWTManager, create_access_token, create_refresh_token
+from flask_jwt_extended import JWTManager, create_access_token, create_refresh_token, jwt_required, get_jwt_identity
+from datetime import timedelta
 from messages import message_chat,messages_by_id
 from models import db,Message,Contact ,User
 from contacts import Contact_List, Contact_by_id
@@ -15,6 +17,7 @@ app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///chit-chat.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config["JWT_SECRET_KEY"] = "super-secret"
+app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(hours=1)
 app.json.compact = False
 
 migrations =Migrate(app ,db)
@@ -102,6 +105,16 @@ class User_Login(Resource):
                     return {'message': 'Invalid phone number or password'}, 401
             else:
                 return {'message': 'User not found'}, 404
+            
+
+class RefreshAccess(Resource):
+    @jwt_required(refresh=True)
+    def post(self):
+        identity = get_jwt_identity()
+
+        access_token = create_access_token(identity=identity)
+
+        return jsonify(access_token = access_token)
 
 
 
@@ -116,6 +129,8 @@ api.add_resource(User_Login, '/login')
 
 api.add_resource(Status_List, '/statuses')
 api.add_resource(Status_by_id, '/statuses/<int:id>')
+
+api.add_resource(RefreshAccess, '/refreshaccess')
 
 
 
