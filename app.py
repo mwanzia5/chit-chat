@@ -6,10 +6,10 @@ from flask_cors import CORS
 from flask_bcrypt import Bcrypt , generate_password_hash
 from flask_jwt_extended import JWTManager, create_access_token, create_refresh_token, jwt_required, get_jwt_identity
 from datetime import timedelta
-from messages import message_chat,messages_by_id
-from models import db,Message,Contact ,User
-from contacts import Contact_List, Contact_by_id
-from statuses import Status_List, Status_by_id
+from models import db, User
+from resources.messages import Message_List, Message_by_id
+from resources.statuses import Status_List, Status_by_id
+
 
 
 app = Flask(__name__)
@@ -31,11 +31,32 @@ bcrypt = Bcrypt(app)
 jwt = JWTManager(app)
 
 
-@app.route("/")
-def hello():
-    return "<h1>Hello chit-chat</h1>"
+class User_List(Resource):
+    @jwt_required()
+    def get(self):
+        user_list = []
+        for user in User.query.all():
+            user_dict = user.to_dict()
+            user_list.append(user_dict)
 
+        response = make_response(
+            jsonify(user_list),
+            200,
+        )
+        return response
+    
+class User_by_id(Resource):
+    @jwt_required()
+    def get(self, id):
+        user = User.query.filter_by(id = id).first()
+        user_dict = user.to_dict()
 
+        response = make_response(
+            jsonify(user_dict),
+            200,
+        )
+        return response
+    
 class User_Signup(Resource):
     parser = reqparse.RequestParser()
     parser.add_argument('first_name', required=True, help="Firstname is required")
@@ -45,7 +66,6 @@ class User_Signup(Resource):
     parser.add_argument('profile_photo', required=False)
 
     def post(self):
-        
         # Extract user information from the request
         data = User_Signup.parser.parse_args()
         new_user = User(**data)
@@ -74,14 +94,8 @@ class User_Login(Resource):
         parser.add_argument('password', required=True, help="Password is required")
         
         def post(self):
-
-            data = User_Login.parser.parse_args()
-
             # Extract user information from the request
-            # phone_number = request.form.get('phone_number')
-            # password = request.form.get('password')
-            # print(phone_number)
-            # print(password)
+            data = User_Login.parser.parse_args()
 
             # Find the user with the provided phone number
             user = User.query.filter_by(phone_number= data['phone_number']).first()
@@ -105,32 +119,20 @@ class User_Login(Resource):
                     return {'message': 'Invalid phone number or password'}, 401
             else:
                 return {'message': 'User not found'}, 404
-            
-
-class RefreshAccess(Resource):
-    @jwt_required(refresh=True)
-    def post(self):
-        identity = get_jwt_identity()
-
-        access_token = create_access_token(identity=identity)
-
-        return jsonify(access_token = access_token)
 
 
 
-api.add_resource(Contact_List, '/contacts')
-api.add_resource(Contact_by_id, '/contacts/<int:id>')
-
-api.add_resource(message_chat, '/messages')
-api.add_resource(messages_by_id, '/messages/<int:id>')
+api.add_resource(User_List, '/users')
+api.add_resource(User_by_id, '/users/<int:id>')
 
 api.add_resource(User_Signup, '/signup')
 api.add_resource(User_Login, '/login')
 
+api.add_resource(Message_List, '/messages')
+api.add_resource(Message_by_id, '/messages/<int:id>')
+
 api.add_resource(Status_List, '/statuses')
 api.add_resource(Status_by_id, '/statuses/<int:id>')
-
-api.add_resource(RefreshAccess, '/refreshaccess')
 
 
 

@@ -1,9 +1,16 @@
 from flask import make_response, jsonify, request
-from flask_restful import Resource
+from flask_restful import Resource, reqparse
 from flask_jwt_extended import jwt_required
 from models import db, Status
 
+
 class Status_List(Resource):
+
+    parser = reqparse.RequestParser()
+    parser.add_argument('user_id', required=True, help="user_id is required")
+    parser.add_argument('status_text', required=True, help="status_text is required")
+    parser.add_argument('photo_url', required=False)
+
     @jwt_required()
     def get(self):
         status_list = []
@@ -16,13 +23,11 @@ class Status_List(Resource):
             200,
         )
         return response
-    
+    @jwt_required()
     def post(self):
-        new_status = Status(
-            status_text = request.get_json().get("status_text"),
-            photo_url = request.get_json().get("photo_url"),
-            user_id = request.get_json().get("user_id"),
-            )
+        data = Status_List.parser.parse_args()
+        new_status = Status(**data)
+
         db.session.add(new_status)
         db.session.commit()
 
@@ -35,8 +40,10 @@ class Status_List(Resource):
 
         return response
     
-class Status_by_id(Resource):
 
+
+class Status_by_id(Resource):
+    @jwt_required()
     def get(self, id):
         status = Status.query.filter_by(id = id).first()
         status_dict = status.to_dict()
@@ -47,7 +54,7 @@ class Status_by_id(Resource):
         )
         return response
 
-
+    @jwt_required()
     def patch(self,id):
         status = Status.query.filter_by(id = id).first()
         for attr in request.get_json():
@@ -65,7 +72,7 @@ class Status_by_id(Resource):
 
         return response
 
-
+    @jwt_required()
     def delete(self,id):
         status = Status.query.filter_by(id = id).first()
         db.session.delete(status)

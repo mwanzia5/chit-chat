@@ -7,7 +7,7 @@ db = SQLAlchemy()
 class User(db.Model, SerializerMixin):
     __tablename__ = 'users'
 
-    serialize_rules = ('-message.user',)
+    serialize_rules = ('-password',)
     
     id = db.Column(db.Integer,primary_key = True)
     first_name =db.Column(db.String,nullable = False)
@@ -17,7 +17,8 @@ class User(db.Model, SerializerMixin):
     profile_photo = db.Column (db.VARCHAR ,nullable = True)
     created_at = db.Column(db.TIMESTAMP, server_default=db.func.now())
 
-    messages = db.relationship('Message', backref = 'user')
+    messages_sent = db.relationship('Message', backref = 'sender', foreign_keys = 'Message.sender_id')
+    messages_received = db.relationship('Message', backref = 'receiver', foreign_keys = 'Message.receiver_id')
     statuses = db.relationship('Status', backref = 'user')
     
     def __repr__(self):
@@ -38,20 +39,20 @@ class User(db.Model, SerializerMixin):
                 "phone_number": self.phone_number,
                 "profile_photo": self.profile_photo
                 }
-
-
+    
 
 class Message(db.Model, SerializerMixin):
     __tablename__ = 'messages'
 
-    serialize_rules = ('-user', '-contact',)
+    serialize_rules = ('-sender', '-receiver',)
 
     id = db.Column(db.Integer,primary_key = True)
-    contact_id= db.Column(db.Integer,db.ForeignKey('contacts.id'))
-    user_id = db.Column(db.Integer,db.ForeignKey('users.id'))
     message = db.Column(db.VARCHAR,nullable = True)
     sent_at = db.Column(db.TIMESTAMP,server_default=db.func.now())
     media = db.Column(db.VARCHAR,nullable=True)
+    
+    sender_id = db.Column(db.Integer,db.ForeignKey('users.id'))
+    receiver_id = db.Column(db.Integer,db.ForeignKey('users.id'))
 
     def __repr__(self):
         return {"id": self.id, 
@@ -63,32 +64,6 @@ class Message(db.Model, SerializerMixin):
                 }
 
 
-class Contact(db.Model, SerializerMixin):
-    __tablename__ = 'contacts'
-
-    serialize_rules = ('-messages.contact','-messages.user')
-
-    id = db.Column(db.Integer,primary_key = True)
-    first_name =db.Column(db.String,nullable = False)
-    last_name  = db.Column (db.String,nullable = False)
-    phone_number = db.Column(db.String,nullable = False ,unique=True)
-    about=db.Column(db.VARCHAR,nullable=True)
-    profile_photo = db.Column (db.VARCHAR ,nullable = True)
-    previous_chat=db.Column(db.VARCHAR,nullable = True)
-    last_seen=db.Column(db.TIMESTAMP,server_default=db.func.now())
-
-    messages = db.relationship('Message', backref = 'contact')
-
-    def __repr__(self):
-        return {"id": self.id, 
-                "first_name": self.first_name, 
-                "last_name": self.last_name,
-                "phone_number": self.phone_number,
-                "about": self.about,
-                "profile_photo": self.profile_photo,
-                "previous_chat": self.previous_chat,
-                "last_seen": self.last_seen
-                }
     
 class Status(db.Model, SerializerMixin):
     __tablename__ = 'statuses'
@@ -109,4 +84,3 @@ class Status(db.Model, SerializerMixin):
                 "photo_url": self.photo_url,
                 "user_id": self.user_id,
                 }
-
